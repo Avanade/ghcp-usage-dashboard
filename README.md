@@ -1,18 +1,5 @@
 # GitHub Copilot Usage and Adoption Analysis
 
-## Table of Contents
-
-- [Python: Productivity Impact Calculator](#productivity-impact-calculator)
-- [Python: GitHub Copilot Usage Dashboard](#github-copilot-usage-dashboard)  
-- [PowerShell: Using the PowerShell Script](#using-the-powershell-script) 
-- [Authors](#authors)
-- [License](#license)
-
-
-```
-This Python application leverages the power of the Streamlit Web Framework to bring you two features: A Productivity Impact Calculator and a GitHub Copilot usage dashboard. It can be integrated with Azure OpenAI for enhanced AI-driven Analysis functionality.
-```
-
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 ![GitHub](https://img.shields.io/github/license/Avanade/ghcp-usage-dashboard)
 ![GitHub Repo stars](https://img.shields.io/github/stars/Avanade/ghcp-usage-dashboard?style=social)
@@ -37,19 +24,9 @@ This Python application leverages the power of the Streamlit Web Framework to br
 ## Licensing
 
 ```
-This project is licensed under the MIT License - see the `LICENSE.md` file for details.
+This project is licensed under the MIT License - see the `LICENSE` file for details.
 ```
 
-## Solutions Referenced
-
-- [Azure SQL Database ledger tables](https://docs.microsoft.com/en-us/azure/azure-sql/database/ledger-overview?WT.mc_id=AI-MVP-5004204)
-- [Azure Confidential Ledger](https://docs.microsoft.com/en-gb/azure/confidential-ledger/?WT.mc_id=AI-MVP-5004204)
-
-
-```
-These are provided as examples. Include links to components you have used, or delete this section.
-DELETE THIS COMMENT
-```
 
 ## Documentation
 The `docs` folder contains [more detailed documentation](./docs/start-here.md), along with setup instructions.
@@ -65,7 +42,7 @@ DELETE THIS COMMENT
 ```
 
 ## Contact
-Feel free to [raise an issue on GitHub](https://github.com/Avanade/avanade-template/issues), or see our [security disclosure](./SECURITY.md) policy.
+Feel free to [raise an issue on GitHub](https://github.com/Avanade/ghcp-usage-dashboard/issues), or see our [security disclosure](./SECURITY.md) policy.
 ```
 Update the repo URL.
 DELETE THIS COMMENT

@@ -1,101 +1,204 @@
-# Documentation Overview
+## Getting Started
 
-This repository provides a sample of patterns and practices for Avanade projects.
-```
-Update this description.
-DELETE THIS COMMENT
-```
+These instructions will set you up for running the Python Dashboard on your local machine for development and testing purposes.
 
-## Related
+### Prerequisites
 
-- **[How to contribute](../CONTRIBUTING.md)**
-- **[Our code of conduct](../CODE_OF_CONDUCT.md)**
+You need to have Python installed on your machine. You can download Python [here](https://www.python.org/downloads/).
 
-## Folder Structure
-```
-Add additional folders that your project uses
-DELETE THIS COMMENT
-```
-- docs - documentation, process flows and state diagrams, and technical architecture.
-- test - automated tests
-- .vscode - configuration and recommendations for the VS Code IDE.
-- .devcontainer - default configuration for GitHub codespaces or containerized development.
+### Running Locally
 
-# Getting started
-## Installation
+1. Clone the repository to your local machine.
+2. Navigate to the project directory.
 
-### Software Installation for Node
-```
-Delete this section if your project doesn't use node
-DELETE THIS COMMENT
+>Note: When using GitHub Codespaces, you may skip steps 3,4 and 5. When you launch a GitHub Codespaces instance, the virtual environment is automatically created, and the required packages are installed, along with the GitHub Copilot extension.
+
+
+3. Create a virtual environment using the following command:
+
+```powershell
+python -m venv usage
 ```
 
-1. Open the `.env.template` file, and update with your settings - save it as `.env`
-2. Run `npm install` to ensure you have all dependencies.
-3. Run the development server with `npm run dev`
-4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`usage` is the name of the virtual environment. You can replace it with any name you prefer.
 
-## Python Tooling
-```
-Delete this section if your project doesn't use python
-DELETE THIS COMMENT
+4. Activate the virtual environment:
+
+- **Windows**:
+
+```powershell
+./venv/scripts/activate
 ```
 
-The tooling uses Python, and we recommend using a conda environment when installing requirements, for example:
+- **Linux/Mac**:
 
 ```bash
-$ conda create --name distribdata python=3.9 -y
-$ conda activate distribdata
-$ pip install -r requirements-dev.txt
+source usage/bin/activate
 ```
 
-### Software Installation for Python
-```
-Delete this section if your project doesn't use python
-DELETE THIS COMMENT
-```
+5. Install the required packages using pip:
 
-1. Create a separate Python environment for your installation, and activate it. You have two options:
-
-   a. _Use a Conda distribution_
-
-   If you are using a distribution of conda, you may want to create a new conda environment, rather than use venv:
-
-   `conda create --name distribdata python=3.9 -y`
-
-   b. _Use a Python virtual environment_
-
-   On Windows, you may need to use `python` command where there are references to the `python3` command.
-
-   On linux, you may need to run `sudo apt-get install python3-venv` first.
-
-   ```bash
-   $ python3 -m venv env
-   $ source env/bin/activate
-   $ pip3 install -r requirements-dev.txt
-   ```
-
-2. Install the required dependencies in your new Python environment.
-
-   ```bash
-   $ pip3 install -r requirements-dev.txt
-   ```
-
-   The `requirements.txt` file can be used alone if you don't intend to develop further.
-
-### Running the SQL code directly
-```
-Delete this section if your project doesn't have SQL
-DELETE THIS COMMENT
+```bash
+pip install -r requirements.txt
 ```
 
-You can use the [SQL Server](https://marketplace.visualstudio.com/items?itemName=ms-mssql.mssql) extension for VS Code to run the SQL ledger examples directly. On non-windows machines, make sure you have drivers for MS SQL installed.
+6. Rename .env.sample to .env and fill in the necessary environment variables.
 
-On a mac, you can run the following commands:
+**Environment Variables**
 
+The following environment variables are optional/required for the application to run:
+
+- `AZURE_OPENAI_API_VERSION`: (Optional) The API version for Azure OpenAI. Example: "your_api_version"
+- `AZURE_OPENAI_ENDPOINT`: (Optional) The endpoint for Azure OpenAI. Example: "https://your_endpoint.openai.azure.com/"
+- `AZURE_OPENAI_API_KEY`: (Optional) The API key for Azure OpenAI. Example: "your_api_key"
+- `AZURE_OPENAI_ENGINE`: (Optional) The engine for Azure OpenAI. Example: "your_engine"
+- `GHCP_TOKEN`: (Required) The GitHub Copilot REST API token. Example: "your_ghcp_token"
+- `ORG_NAME`: (Required) The name of your GitHub organization. Example: "your_org_name"
+- `ORG_ID`: (Optional) The ID of your GitHub organization. Example: "your_org_id"
+
+> The Azure OpenAI environment variables are used in the Productivity Calculator page. Azure OpenAI Analyzes the Calculations and provides further recommendations generated by the new GPT-4o (Omni) Model. Leaving these environment variables empty will skip AI  analysis.
+
+Make sure to set these environment variables before running the application.
+
+The `requirements.txt` file includes all the necessary packages, such as streamlit, openai, azure-ai-documentintelligence, azure-ai-formrecognizer, azure-cognitiveservices-speech, azure-common, azure-core, azure-identity, azure-search-documents, bs4, langchain, langchain_community, langchain_core, langchain_openai, markdown, matplotlib, opencv-python, pyperclip, pypdfium2, python-docx, python-dotenv, python-pptx, PyMuPDF, PyPDF2, requests, streamlit-webrtc, unstructured, youtube-transcript-api, and plotly.
+
+### Running the Application
+
+To run the application, ensure that you are in the project directory and the virtual environment is activated. Then, execute the following command in the terminal:
+
+```bash
+streamlit run home.py
 ```
-brew install unixodbc
-brew tap microsoft/mssql-release https://github.com/Microsoft/homebrew-mssql-release
-brew update
-brew install msodbcsql mssql-tools
+
+### Project Structure
+
+The project has the following structure:
+
+- `helpers/`: This directory contains helper functions for the application.
+- `api.py`: Contains functions related to API calls.
+- `charts.py`: Contains functions for generating charts.
+- `openai.py`: Contains functions related to OpenAI.
+- `pages/`: This directory contains the Streamlit pages for the application.
+- `productivity_calculator.py`: The productivity calculator page.
+- `usage_dashboard.py`: The usage dashboard page.
+- `home.py`: The main file to run the application.
+- `.env`: Contains environment variables. You need to create this file based on `.env.sample`.
+- `requirements.txt`: Contains the required packages for the project.
+
+### How to Use the Application
+
+1. **Navigate to the Home Page**:
+   - Start by opening the application. The home page provides an overview of the available features.
+
+2. **Select a Feature from the Sidebar**:
+   - Use the sidebar to navigate to either the Productivity Calculator or the Usage Dashboard.
+
+3. **Using the Productivity Calculator**:
+   - Enter the required values in the sidebar.
+   - Click the "Calculate" button to perform the calculations.
+   - View the results displayed on the page.
+   - If the Azure OpenAI environment variables are  set, the AI-powered analysis automatically execute. Otherwise, it will be skipped.
+
+    **AI Analysis**: The AI model, guided by a predefined system prompt, analyzes the provided data. The prompt instructs the AI to:
+    - Start with a forward-looking statement about the anticipated influence of GitHub Copilot on productivity.
+    - Emphasize key observations that can aid in decision-making.
+    - Provide suggestions on how to further enhance productivity impact.
+
+4. **Using the Usage Dashboard**:
+   - View various charts and metrics related to GitHub Copilot usage.
+   - Click the "AI-Powered Data Analysis" button to get insights on usage trends.
+   - If the API key is set, an analysis will be generate against the available usage data. Otherwise, an error message will be displayed.
+
+    **AI Analysis**: The AI model, guided by a detailed system prompt, analyzes the provided data. The prompt instructs the AI to focus on several key areas:
+    - **Adoption Trends**: Explore how GitHub Copilot adoption has evolved over time, highlighting significant increases or decreases.
+    - **Usage Patterns**: Examine trends in user interactions with suggestions, including the frequency and type of suggestions made.
+    - **Acceptance Analysis**: Break down the acceptance rate of suggestions, identifying high and low acceptance scenarios and possible reasons.
+    - **Key Metrics**: Evaluate critical metrics such as the average number of active users and the average acceptance rate, and discuss their implications.
+    - **User Segmentation**: Segment the user base to see if different groups (e.g., beginners vs. experienced developers) have varying usage patterns.
+    - **Language-Based Aggregations**: Analyze suggestions, acceptances, lines suggested, and active users per programming language.
+    - **Editor-Based Aggregations**: Analyze suggestions, acceptances, lines suggested, and active users per code editor.
+
+
+**Built With**
+
+- Python
+- Streamlit
+- Azure OpenAI
+- GitHub Copilot REST API
+
+## Using the PowerShell Script
+Using the PowerShell Script to Extract GitHub Copilot Usage Data.
+
+The [`extract-ghcp-usage-data.ps1`](../powershell/extract-ghcp-usage-data.ps1) PowerShell script is designed to fetch and normalize GitHub Copilot usage data for your organization. This guide will walk you through the steps to use the script effectively.
+
+#### Prerequisites
+
+Before running the script, ensure you have the following:
+
+1. **PowerShell**: Make sure you have PowerShell installed on a **Windows** machine.
+2. **GitHub Copilot REST API Token**: You need a valid GitHub Copilot REST API token. Follow these instructions to generate a personal access token: [Managing your personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
+3. **Organization Name**: The name of your GitHub organization.
+4. The following permissions set in for your GitHub organization profile:
+
+- [x] copilot
+  - [x] manage_billing:copilot
+
+
+#### Setting Up Environment Variables
+
+The script relies on environment variables to authenticate and fetch data from the GitHub API. You need to set the following environment variables:
+
+- `GHCP_TOKEN`: Your GitHub Copilot REST API token.
+- `ORG_NAME`: The name of your GitHub organization.
+
+You can set these environment variables in your PowerShell session using the following commands:
+
+```powershell
+Set-Item -Path Env:GHCP_TOKEN -Value "your-ghcp-token"
+Set-Item -Path Env:ORG_NAME -Value "your-org-name"
 ```
+
+Alternatively, you can add these variables to your system environment variables.
+
+#### Running the Script
+
+1. **Clone the Repository**: If you haven't already, clone the repository containing the script to your local machine.
+
+2. **Navigate to the `powershell` Directory**: Open a PowerShell terminal and navigate to the directory containing the [`extract-ghcp-usage-data.ps1`](./powershell/extract-ghcp-usage-data.ps1") script.
+
+3. **Execute the Script**: Run the script using the following command:
+
+```powershell
+.\extract-ghcp-usage-data.ps1
+```
+
+#### Script Output
+
+The script performs the following actions:
+
+1. **Fetches Copilot Usage Data**: Calls the GitHub API to retrieve seats and usage data for your organization.
+2. **Normalizes the Data**: Processes and normalizes the data to ensure it is in a consistent format.
+3. **Exports Data to CSV**: Saves the normalized data to CSV files in the `data` directory. The `data` directory is created automaticall under the `powershell` directory if it does not exist.
+
+The script generates two CSV files:
+
+- `ghcp-seats-data-YYYY-MM-DD.csv`
+- `ghcp-usage-data-YYYY-MM-DD.csv`
+
+The `YYYY-MM-DD` part of the file name corresponds to the date when the script was run.
+
+#### Example Output
+
+After running the script, you should see output similar to the following:
+
+```plaintext
+Copilot usage data saved to data/ghcp-seats-data-2024-07-11.csv
+Usage data saved to data/ghcp-usage-data-2024-07-11.csv
+```
+
+#### Troubleshooting
+
+- **Invalid Token**: Ensure your `GHCP_TOKEN` is correct and has the necessary permissions.
+- **Network Issues**: Check your internet connection if the script fails to fetch data. Verify if you require any firewall or proxy settings.
+- **Environment Variables**: Verify that the environment variables are set correctly.
+

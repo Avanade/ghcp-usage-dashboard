@@ -131,7 +131,7 @@ def create_gauge_chart(value, threshold):
     # Adjust the size of the chart
     fig.update_layout(
         autosize=False,
-        width=350,        
+        width=340,        
         height=280, 
         margin=dict(l=1, r=25, b=1, t=1),
         paper_bgcolor='rgba(0,0,0,0)',

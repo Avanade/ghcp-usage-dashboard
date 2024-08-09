@@ -76,10 +76,7 @@ try:
 
     # print(response)
 
-    added_this_cycle = response[0]
-    active_this_cycle = response[1]
-    inactive_this_cycle = response[2]
-    total = response[3]
+    added_this_cycle, active_this_cycle, inactive_this_cycle, total = response[:4]
 
     # Change column definition    
     bcol = st.columns((1,1,1,1))
