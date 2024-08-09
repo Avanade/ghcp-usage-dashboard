@@ -1,4 +1,5 @@
 {
+    // Developed on GitHub Codespaces
     "name": "GitHub Copilot Usage Dashboard",
     "image": "mcr.microsoft.com/vscode/devcontainers/python:3.10",
     "settings": {

@@ -1,41 +1,43 @@
-| :point_up:    | Remember: Change all the information in this file when your project is created, following the comments between the ``` symbols. |
-|---------------|:------------------------|
+# GitHub Copilot Usage and Adoption Analysis
 
-# avanade-template
-> This is an example template for Avanade Open Source and InnerSource projects.
+## Table of Contents
+
+- [Python: Productivity Impact Calculator](#productivity-impact-calculator)
+- [Python: GitHub Copilot Usage Dashboard](#github-copilot-usage-dashboard)  
+- [PowerShell: Using the PowerShell Script](#using-the-powershell-script) 
+- [Authors](#authors)
+- [License](#license)
+
 
 ```
-Add a short description of your project.
-DELETE THIS COMMENT
+This Python application leverages the power of the Streamlit Web Framework to bring you two features: A Productivity Impact Calculator and a GitHub Copilot usage dashboard. It can be integrated with Azure OpenAI for enhanced AI-driven Analysis functionality.
 ```
 
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-![GitHub issues](https://img.shields.io/github/issues/Avanade/avanade-template)
-![GitHub](https://img.shields.io/github/license/Avanade/avanade-template)
-![GitHub Repo stars](https://img.shields.io/github/stars/Avanade/avanade-template?style=social)
+![GitHub](https://img.shields.io/github/license/Avanade/ghcp-usage-dashboard)
+![GitHub Repo stars](https://img.shields.io/github/stars/Avanade/ghcp-usage-dashboard?style=social)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](https://avanade.github.io/code-of-conduct/)
-[![Incubating InnerSource](https://img.shields.io/badge/Incubating-Ava--Maturity-%23FF5800?labelColor=yellow)](https://avanade.github.io/maturity-model/)
 
-```
-Update the repository URL addresses for the shield templates.
-DELETE THIS COMMENT
-```
 
 ## Overview
-Describe the project in more detail. **This project is an example project, to be used when creating new Avanade Open Source projects.**
+This Python application leverages the power of the Streamlit Web Framework to bring you two features: A Productivity Impact Calculator and a GitHub Copilot usage dashboard. It can be integrated with Azure OpenAI for enhanced AI-driven Analysis functionality.
 
-```
-Add a description of your project, and a screenshot if possible.
-DELETE THIS COMMENT
-```
+## Productivity Impact Calculator
 
+<img src="images/prod-impact-calc.png" alt="Productivity Impact Calculator" width="800"/>
+
+## GitHub Copilot Usage Dashboard
+
+<img src="images/ghcp-usage-dashboard.png" alt="Productivity Impact Calculator" width="800"/>
+
+### AI Powered Insights (on GHCP Usage
+
+<img src="images/ai-powered-insights.png" alt="Productivity Impact Calculator" width="800"/>
 
 ## Licensing
-avanade-template is UNLICENSED and for internal use only, without legal review. See the Avanade Open Source site to start legal approvals.
+
 ```
-The avanade-template is available under the MIT licence, but subsequent projects created on Avanade InnerSource are not.
-Update the project name and licence.
-DELETE THIS COMMENT
+This project is licensed under the MIT License - see the `LICENSE.md` file for details.
 ```
 
 ## Solutions Referenced
