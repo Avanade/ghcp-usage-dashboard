@@ -18,7 +18,7 @@ This Python application leverages the power of the Streamlit Web Framework to br
 
 <img src="images/ghcp-usage-dashboard.png" alt="Productivity Impact Calculator" width="800"/>
 
-### AI Powered Insights (on GHCP Usage
+### AI Powered Insights (with GHCP Usage as context)
 
 <img src="images/ai-powered-insights.png" alt="Productivity Impact Calculator" width="800"/>
 
