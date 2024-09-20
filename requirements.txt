@@ -7,7 +7,7 @@ azure-identity==1.15.0
 azure-search-documents==11.4.0
 bs4==0.0.2
 langchain==0.1.4
-langchain_community==0.0.16
+langchain_community==0.2.9
 langchain_core==0.1.17
 langchain_openai
 markdown==3.3.4
