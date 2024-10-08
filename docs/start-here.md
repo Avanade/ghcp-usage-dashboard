@@ -14,7 +14,7 @@ You need to have Python installed on your machine. You can download Python [here
 >Note: When using GitHub Codespaces, you may skip steps 3,4 and 5. When you launch a GitHub Codespaces instance, the virtual environment is automatically created, and the required packages are installed, along with the GitHub Copilot extension.
 
 
-3. Create a virtual environment using the following command:
+3. Create a Python virtual environment using the following command:
 
 ```powershell
 python -m venv usage
