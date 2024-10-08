@@ -42,7 +42,7 @@ source usage/bin/activate
 pip install -r requirements.txt
 ```
 
-6. Rename .env.sample to .env and fill in the necessary environment variables.
+6. Create a new `.env` file and fill in the necessary environment variables.
 
 **Environment Variables**
 
