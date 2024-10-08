@@ -20,7 +20,7 @@ You need to have Python installed on your machine. You can download Python [here
 python -m venv usage
 ```
 
-`usage` is the name of the virtual environment. You can replace it with any name you prefer.
+`usage` is the name of the virtual environment. You can use any environment name you prefer.
 
 4. Activate the virtual environment:
 
@@ -42,7 +42,7 @@ source usage/bin/activate
 pip install -r requirements.txt
 ```
 
-6. Rename .env.sample to .env and fill in the necessary environment variables.
+6. Create a new `.env` file and fill in the necessary environment variables.
 
 **Environment Variables**
 
