@@ -8,7 +8,7 @@ You need to have Python installed on your machine. You can download Python [here
 
 ### Running Locally
 
-1. Clone the repository to your local machine.
+1. Fork or Clone this repository.
 2. Navigate to the project directory.
 
 >Note: When using GitHub Codespaces, you may skip steps 3,4 and 5. When you launch a GitHub Codespaces instance, the virtual environment is automatically created, and the required packages are installed, along with the GitHub Copilot extension.
