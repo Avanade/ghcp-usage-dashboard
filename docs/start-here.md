@@ -20,7 +20,7 @@ You need to have Python installed on your machine. You can download Python [here
 python -m venv usage
 ```
 
-`usage` is the name of the virtual environment. You can replace it with any name you prefer.
+`usage` is the name of the virtual environment. You can use any environment name you prefer.
 
 4. Activate the virtual environment:
 
