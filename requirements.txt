@@ -22,7 +22,7 @@ python-pptx==0.6.21
 PyMuPDF>=1.18.14
 PyPDF2==1.26.0
 requests==2.28.2
-streamlit==1.31.0
+streamlit==1.37.0
 streamlit-webrtc==0.47.1
 unstructured
 youtube-transcript-api==0.6.1
