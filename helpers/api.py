@@ -37,28 +37,145 @@ all_seats = []
 
 # Set the API endpoint for number of users
 billing_users_url = f"https://api.github.com/orgs/{ORG_NAME}/copilot/billing"
-usage_url = f"https://api.github.com/orgs/{ORG_NAME}/copilot/usage"
+usage_url = f"https://api.github.com/orgs/{ORG_NAME}/copilot/metrics"
 
 def get_response_from_usage():
-    # Call the API to get the usage data
-    response = requests.get(usage_url, headers=headers)
+    try:
+        response = requests.get(usage_url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        
+        # Update cache
+        cache["data"] = data
+        cache["expiry"] = datetime.now() + CACHE_EXPIRY
+        
+        return data
+    except requests.RequestException as e:
+        st.error(f"Error fetching usage data: {str(e)}")
+        return None
 
-    # Parse the JSON response
-    data = response.json()
+def process_metrics_data(data):
+    if not data:
+        return pd.DataFrame()
+    
+    # Initialize lists to store flattened data
+    records = []
+    
+    for daily_data in data:
+        # Process IDE code completions
+        if 'copilot_ide_code_completions' in daily_data:
+            for editor in daily_data['copilot_ide_code_completions'].get('editors', []):
+                for model in editor.get('models', []):
+                    for lang in model.get('languages', []):
+                        records.append({
+                            'date': daily_data['date'],
+                            'feature_type': 'ide_code',
+                            'editor': editor['name'],
+                            'model_name': model['name'],
+                            'is_custom_model': model['is_custom_model'],
+                            'language': lang['name'],
+                            'engaged_users': lang['total_engaged_users'],
+                            'suggestions': lang.get('total_code_suggestions', 0),
+                            'acceptances': lang.get('total_code_acceptances', 0),
+                            'lines_suggested': lang.get('total_code_lines_suggested', 0),
+                            'lines_accepted': lang.get('total_code_lines_accepted', 0)
+                        })
+        
+        # Process IDE chat
+        if 'copilot_ide_chat' in daily_data:
+            for editor in daily_data['copilot_ide_chat'].get('editors', []):
+                for model in editor.get('models', []):
+                    records.append({
+                        'date': daily_data['date'],
+                        'feature_type': 'ide_chat',
+                        'editor': editor['name'],
+                        'model_name': model['name'],
+                        'is_custom_model': model['is_custom_model'],
+                        'engaged_users': model['total_engaged_users'],
+                        'total_chats': model.get('total_chats', 0),
+                        'chat_insertions': model.get('total_chat_insertion_events', 0),
+                        'chat_copies': model.get('total_chat_copy_events', 0)
+                    })
+        
+        # Process dotcom chat
+        if 'copilot_dotcom_chat' in daily_data:
+            for model in daily_data['copilot_dotcom_chat'].get('models', []):
+                records.append({
+                    'date': daily_data['date'],
+                    'feature_type': 'dotcom_chat',
+                    'editor': 'github.com',
+                    'model_name': model['name'],
+                    'is_custom_model': model['is_custom_model'],
+                    'engaged_users': model['total_engaged_users'],
+                    'total_chats': model.get('total_chats', 0)
+                })
+        
+        # Process PR data
+        if 'copilot_dotcom_pull_requests' in daily_data:
+            for repo in daily_data['copilot_dotcom_pull_requests'].get('repositories', []):
+                for model in repo.get('models', []):
+                    records.append({
+                        'date': daily_data['date'],
+                        'feature_type': 'pull_requests',
+                        'repository': repo['name'],
+                        'model_name': model['name'],
+                        'is_custom_model': model['is_custom_model'],
+                        'engaged_users': model['total_engaged_users'],
+                        'pr_summaries': model.get('total_pr_summaries_created', 0)
+                    })
+    
+    return pd.DataFrame(records)
 
-    # Send data to Azure OpenAI
-    #send_data_to_openai(data)
+def get_copilot_stats():
+    data = get_response_from_usage()
+    if not data:
+        return pd.DataFrame()
+    
+    df = process_metrics_data(data)
+    return df
 
-    # Update the cache
-    cache["data"] = data
-    cache["expiry"] = datetime.now() + CACHE_EXPIRY
+def get_acceptance_versus_suggested():
+    df = get_copilot_stats()
+    if df.empty:
+        return
+    
+    # Filter for IDE code completions and aggregate by date
+    ide_code_df = df[df['feature_type'] == 'ide_code'].groupby('date').agg({
+        'suggestions': 'sum',
+        'acceptances': 'sum'
+    }).reset_index()
+    
+    # Create the visualization
+    fig = px.area(ide_code_df, 
+                  x='date', 
+                  y=['acceptances', 'suggestions'],
+                  title='Copilot Acceptances vs Suggestions',
+                  markers=True)
+    
+    fig.update_layout(height=400, title_font=dict(color='#1f77b4'))
+    st.plotly_chart(fig, use_container_width=True)
 
-    return data
+def get_lines_accepted_versus_suggested():
+    df = get_copilot_stats()
+    if df.empty:
+        return
+    
+    # Filter for IDE code completions and aggregate by date
+    ide_code_df = df[df['feature_type'] == 'ide_code'].groupby('date').agg({
+        'lines_suggested': 'sum',
+        'lines_accepted': 'sum'
+    }).reset_index()
+    
+    # Create the visualization
+    fig = px.area(ide_code_df,
+                  x='date',
+                  y=['lines_accepted', 'lines_suggested'],
+                  title='Lines of Code Accepted vs Lines Suggested',
+                  markers=True)
+    
+    fig.update_layout(height=400, title_font=dict(color='#1f77b4'))
+    st.plotly_chart(fig, use_container_width=True)
 
-# Get Usage Data
-data = get_response_from_usage()
-
-# Function to get the Copilot usage
 def get_copilot_usage():
     # Call the API to get the number of users
     response = requests.get(billing_users_url, headers=headers)
@@ -74,183 +191,93 @@ def get_copilot_usage():
     return added_this_cycle, active_this_cycle, inactive_this_cycle, total
 
 def get_copilot_average_acceptance_rate():
-
-    # Initialize counters for total lines suggested and accepted
-    total_lines_suggested = 0
-    total_lines_accepted = 0
-
-    # Iterate over each item in the data
-    for item in data:
-        total_lines_suggested += item['total_suggestions_count']
-        total_lines_accepted += item['total_acceptances_count']
-
+    df = get_copilot_stats()
+    if df.empty:
+        return 0
+    
+    # Filter for IDE code completions
+    ide_code_df = df[df['feature_type'] == 'ide_code']
+    
+    # Calculate totals
+    total_suggestions = ide_code_df['suggestions'].sum()
+    total_acceptances = ide_code_df['acceptances'].sum()
+    
     # Calculate the average acceptance rate
-    average_acceptance_rate = total_lines_accepted / total_lines_suggested if total_lines_suggested else 0
-
-    return average_acceptance_rate
+    return total_acceptances / total_suggestions if total_suggestions else 0
 
 def get_percentage_active_users_past_28_days():
-
-    # Initialize counters for total active users and active users in the past 28 days
-    total_active_users = 0
-    active_users_past_28_days = 0
-
+    df = get_copilot_stats()
+    if df.empty:
+        return 0
+    
+    # Convert date strings to datetime
+    df['date'] = pd.to_datetime(df['date'])
+    
     # Get the date 28 days ago
     date_28_days_ago = datetime.now() - timedelta(days=28)
-
-    # Iterate over each item in the data
-    for item in data:
-        day = datetime.strptime(item['day'], '%Y-%m-%d')
-        total_active_users += item['total_active_users']
-        if day >= date_28_days_ago:
-            active_users_past_28_days += item['total_active_users']
-
-    print(total_active_users, active_users_past_28_days)
-
-    # Calculate the percentage of active users in the past 28 days
-    percentage_active_users_past_28_days = (active_users_past_28_days / total_active_users) * 100 if total_active_users else 0
-
-    return percentage_active_users_past_28_days
+    
+    # Get unique counts of engaged users
+    total_engaged = df['engaged_users'].sum()
+    recent_engaged = df[df['date'] >= date_28_days_ago]['engaged_users'].sum()
+    
+    return (recent_engaged / total_engaged * 100) if total_engaged else 0
 
 def get_average_active_and_chat_users():
-
-    # Initialize counters for total active users and chat users
-    total_active_users = 0
-    total_active_chat_users = 0
-
-    # Iterate over each item in the data
-    for item in data:
-        total_active_users += item['total_active_users']
-        total_active_chat_users += item['total_active_chat_users']
-
-    # Calculate the average active users and chat users
-    average_active_users = total_active_users / len(data) if data else 0
-    average_active_chat_users = total_active_chat_users / len(data) if data else 0
-
-    return "{:.1f}".format(average_active_users), "{:.1f}".format(average_active_chat_users)
-
-
-def get_acceptance_versus_suggested():
-
-    # Initialize lists for days, suggestions, and acceptances
-    days = []
-    suggestions = []
-    acceptances = []
-
-    # Iterate over each item in the data
-    for item in data:
-        days.append(item['day'])
-        suggestions.append(item['total_suggestions_count'])
-        acceptances.append(item['total_acceptances_count'])
-
-    # Create a DataFrame from the lists
-    df = pd.DataFrame({
-        'Day': days,
-        'Suggestions': suggestions,
-        'Acceptances': acceptances
-    })
-
-    # Create a line chart with Plotly
-    fig = px.area(df, x='Day', y=['Acceptances','Suggestions'], title='Copilot Acceptances vs Suggestions', markers=True)
-
-    # Update the layout to change the title font color
-    fig.update_layout(title_font=dict(color='#1f77b4'))
-    fig.update_layout(height=400, title_font=dict(color='#1f77b4'))
-
-    # Display the line chart
-    st.plotly_chart(fig, use_container_width=True)
-
-
+    df = get_copilot_stats()
+    if df.empty:
+        return "0", "0"
+    
+    # Calculate average engaged users for IDE code and chat
+    avg_ide_users = df[df['feature_type'] == 'ide_code']['engaged_users'].mean()
+    avg_chat_users = df[df['feature_type'].isin(['ide_chat', 'dotcom_chat'])]['engaged_users'].mean()
+    
+    return "{:.1f}".format(avg_ide_users or 0), "{:.1f}".format(avg_chat_users or 0)
 
 def get_active_users_by_day():
-
-    # Initialize lists for days, active users, and active chat users
-    days = []
-    active_users = []
-    active_chat_users = []
-
-    # Iterate over each item in the data
-    for item in data:
-        days.append(item['day'])
-        active_users.append(item['total_active_users'])
-        active_chat_users.append(item['total_active_chat_users'])
-
-    # Create a DataFrame from the lists
-    df = pd.DataFrame({
-        'Day': days,
-        'Active Users': active_users,
-        'Active Chat Users': active_chat_users
-    })
-
+    df = get_copilot_stats()
+    if df.empty:
+        return
+    
+    # Aggregate users by date and feature type
+    daily_users = df.groupby(['date', 'feature_type'])['engaged_users'].sum().reset_index()
+    
+    # Pivot the data for plotting
+    plot_df = daily_users.pivot(index='date', columns='feature_type', values='engaged_users').reset_index()
+    plot_df = plot_df.fillna(0)
+    
     # Create a stacked bar chart with Plotly
-    fig = px.bar(df, x='Day', y=['Active Users', 'Active Chat Users'], labels={'x':'Day', 'value':'Users'}, title='Active Users by Day', text='value', barmode='stack')
-
-    # Update layout to show text on bars
-    fig.update_traces(texttemplate='%{text:.2s}', textposition='inside')
+    fig = px.bar(plot_df, 
+                 x='date', 
+                 y=['ide_code', 'ide_chat', 'dotcom_chat'], 
+                 title='Active Users by Day',
+                 labels={'value': 'Users'},
+                 barmode='stack')
+    
     fig.update_layout(height=400, title_font=dict(color='#1f77b4'))
-    # Display the bar chart
-    st.plotly_chart(fig, use_container_width=True)
-
-def get_lines_accepted_versus_suggested():
-
-    # Initialize lists for days, lines suggested, and lines accepted
-    days = []
-    lines_suggested = []
-    lines_accepted = []
-
-    # Iterate over each item in the data
-    for item in data:
-        days.append(item['day'])
-        lines_suggested.append(item['total_lines_suggested'])
-        lines_accepted.append(item['total_lines_accepted'])
-
-    # Create a DataFrame from the lists
-    df = pd.DataFrame({
-        'Day': days,
-        'Lines Suggested': lines_suggested,
-        'Lines Accepted': lines_accepted
-    })
-
-    # Create a line chart with Plotly
-    fig = px.area(df, x='Day', y=['Lines Accepted','Lines Suggested'], title='Lines of Code Accepted vs Lines Suggested', markers=True)
-
-    # Update the layout to change the title font color
-    fig.update_layout(title_font=dict(color='#1f77b4'))
-    fig.update_layout(height=400, title_font=dict(color='#1f77b4'))
-
-    # Display the line chart
     st.plotly_chart(fig, use_container_width=True)
 
 def get_acceptance_rate():
-
-    # Initialize lists for days and acceptance rates
-    days = []
-    acceptance_rates = []
-
-    # Iterate over each item in the data
-    for item in data:
-        days.append(item['day'])
-        # Check if total_suggestions_count is not zero
-        if item['total_suggestions_count'] != 0:
-            # Calculate the acceptance rate and append it to the list
-            acceptance_rate = round((item['total_acceptances_count'] / item['total_suggestions_count']) * 100, 1)
-        else:
-            acceptance_rate = 0
-        acceptance_rates.append(acceptance_rate)
-
-    # Create a DataFrame from the lists
-    df = pd.DataFrame({
-        'Day': days,
-        'Acceptance Rate (%)': acceptance_rates
-    })
-
-    # Create a line chart with Plotly
-    fig = px.area(df, x='Day', y='Acceptance Rate (%)', title='Acceptance Rate (%) by Day', markers=True)
-
-    # Increase the height of the chart
-    fig.update_layout(height=400, title_font=dict(color='#1f77b4'))
+    df = get_copilot_stats()
+    if df.empty:
+        return
     
-    # Display the line chart
+    # Filter for IDE code completions and calculate daily acceptance rates
+    ide_code_df = df[df['feature_type'] == 'ide_code'].groupby('date').agg({
+        'suggestions': 'sum',
+        'acceptances': 'sum'
+    }).reset_index()
+    
+    # Calculate acceptance rate
+    ide_code_df['Acceptance Rate (%)'] = (ide_code_df['acceptances'] / ide_code_df['suggestions'] * 100).round(1)
+    
+    # Create the visualization
+    fig = px.area(ide_code_df, 
+                  x='date', 
+                  y='Acceptance Rate (%)', 
+                  title='Acceptance Rate (%) by Day',
+                  markers=True)
+    
+    fig.update_layout(height=400, title_font=dict(color='#1f77b4'))
     st.plotly_chart(fig, use_container_width=True)
 
 def send_data_to_openai(data):

@@ -131,7 +131,7 @@ def create_gauge_chart(value, threshold):
     # Adjust the size of the chart
     fig.update_layout(
         autosize=False,
-        width=340,        
+        width=350,        
         height=280, 
         margin=dict(l=1, r=25, b=1, t=1),
         paper_bgcolor='rgba(0,0,0,0)',
@@ -201,27 +201,40 @@ def display_flattened_usage_data(data):
 
     # Iterate over each item in the data
     for item in data:
-        # Extract the common fields
-        common_fields = {
-            'day': item['day'],
-            'total_suggestions_count': item['total_suggestions_count'],
-            'total_acceptances_count': item['total_acceptances_count'],
-            'total_lines_suggested': item['total_lines_suggested'],
-            'total_lines_accepted': item['total_lines_accepted'],
-            'total_active_users': item['total_active_users'],
-            'total_chat_acceptances': item['total_chat_acceptances'],
-            'total_chat_turns': item['total_chat_turns'],
-            'total_active_chat_users': item['total_active_chat_users']
-        }
+        # Extract data from IDE code completions
+        if 'copilot_ide_code_completions' in item:
+            for editor in item['copilot_ide_code_completions'].get('editors', []):
+                for model in editor.get('models', []):
+                    for lang in model.get('languages', []):
+                        flattened_data.append({
+                            'date': item['date'],
+                            'feature_type': 'ide_code',
+                            'editor': editor['name'],
+                            'language': lang['name'],
+                            'engaged_users': lang['total_engaged_users'],
+                            'suggestions': lang.get('total_code_suggestions', 0),
+                            'acceptances': lang.get('total_code_acceptances', 0),
+                            'lines_suggested': lang.get('total_code_lines_suggested', 0),
+                            'lines_accepted': lang.get('total_code_lines_accepted', 0)
+                        })
 
-        # Iterate over each breakdown item
-        for breakdown in item['breakdown']:
-            # Combine the common fields with the breakdown fields
-            flattened_item = {**common_fields, **breakdown}
-            flattened_data.append(flattened_item)
+        # Extract data from IDE chat
+        if 'copilot_ide_chat' in item:
+            for editor in item['copilot_ide_chat'].get('editors', []):
+                for model in editor.get('models', []):
+                    flattened_data.append({
+                        'date': item['date'],
+                        'feature_type': 'ide_chat',
+                        'editor': editor['name'],
+                        'engaged_users': model['total_engaged_users'],
+                        'total_chats': model.get('total_chats', 0),
+                        'chat_insertions': model.get('total_chat_insertion_events', 0),
+                        'chat_copies': model.get('total_chat_copy_events', 0)
+                    })
 
     # Create a DataFrame from the flattened data
-    df = pd.DataFrame(flattened_data)
-
-    # Display the DataFrame using Streamlit
-    st.dataframe(df)
+    if flattened_data:
+        df = pd.DataFrame(flattened_data)
+        st.dataframe(df)
+    else:
+        st.warning("No data available to display")

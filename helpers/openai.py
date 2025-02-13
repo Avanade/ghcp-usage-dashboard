@@ -4,14 +4,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Uses Azure Open AI GPT-4-Turbo
-# Make sure you have a running Azure OpenAI service and the credentials are set in the .env file
+# Check for required environment variables
+required_vars = ['AZURE_OPENAI_ENDPOINT', 'AZURE_OPENAI_API_KEY', 'AZURE_OPENAI_ENGINE']
+missing_vars = [var for var in required_vars if not os.environ.get(var)]
+if missing_vars:
+    raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
-# Azure OpenAI API credentials
+# Initialize Azure OpenAI client with minimal required parameters
 client = AzureOpenAI(
-  azure_endpoint = os.environ.get('AZURE_OPENAI_ENDPOINT'), 
-  api_key=os.environ.get('AZURE_OPENAI_API_KEY'),  
-  api_version="2024-02-15-preview"
+    api_version="2024-02-15-preview",
+    azure_endpoint=os.environ['AZURE_OPENAI_ENDPOINT'],
+    api_key=os.environ['AZURE_OPENAI_API_KEY'],
 )
 
 def get_response_prod_calc(text):
